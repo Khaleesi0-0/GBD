@@ -1,0 +1,233 @@
+---
+title: "GBD"
+output: html_document
+date: "2024-05-05"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(ggplot2)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+GBD <- read.csv("C:/Users/khaleesi/Desktop/GBD/GBDrough.csv")
+
+head(GBD)
+GBD %>%
+  count(measure, sort = TRUE) 
+```
+
+## All age 1990
+```{r}
+GBD_1990 <- subset(GBD, 
+                   year == 1990 & 
+                   age == 'All ages' & 
+                   metric == 'Number' & 
+                   measure == 'DALYs (Disability-Adjusted Life Years)')
+
+
+GBD_1990 <- GBD_1990[, c(2, 8, 9, 10,11)] 
+
+GBD_1990$val <- round(GBD_1990$val, 1)  
+
+
+GBD_1990$upper <- round(GBD_1990$upper,1)
+GBD_1990$lower <- round(GBD_1990$lower, 1)
+# Check the dimensions of the dataframe
+dim(GBD_1990)
+
+if (!"Num_1990" %in% colnames(GBD_1990)) {
+  GBD_1990$Num_1990 <- ""
+}
+
+# Update Num_1990 column
+GBD_1990$Num_1990 <- paste('(', round(GBD_1990$val, 1), ")")
+
+GBD_1990$Num_1990 <- paste(GBD_1990$lower, GBD_1990$upper, sep = '-') 
+GBD_1990$Num_1990 <- paste(GBD_1990$Num_1990, ')', sep = '')              
+GBD_1990$Num_1990 <- paste('(', GBD_1990$Num_1990, sep = '')  
+GBD_1990$Num_1990 <- paste(GBD_1990$val, GBD_1990$Num_1990, sep = ' ')
+GBD_1990 <- unique(GBD_1990)
+head(GBD_1990)
+```
+## All age 2019
+```{r}
+GBD_2019 <- subset(GBD, 
+                   year == 2019 & 
+                   age == 'All ages' & 
+                   metric == 'Number' & 
+                   measure == 'DALYs (Disability-Adjusted Life Years)')
+
+
+GBD_2019 <- GBD_2019[, c(2, 8, 9, 10,11)] 
+
+GBD_2019$val <- round(GBD_2019$val, 1)  
+
+
+GBD_2019$upper <- round(GBD_2019$upper,1)
+GBD_2019$lower <- round(GBD_2019$lower, 1)
+# Check the dimensions of the dataframe
+dim(GBD_2019)
+
+if (!"Num_2019" %in% colnames(GBD_2019)) {
+  GBD_2019$Num_2019 <- ""
+}
+
+# Update Num_2019 column
+GBD_2019$Num_2019 <- paste('(', round(GBD_2019$val, 1), ")")
+
+GBD_2019$Num_2019 <- paste(GBD_2019$lower, GBD_2019$upper, sep = '-') 
+GBD_2019$Num_2019 <- paste(GBD_2019$Num_2019, ')', sep = '')              
+GBD_2019$Num_2019 <- paste('(', GBD_2019$Num_2019, sep = '')  
+GBD_2019$Num_2019 <- paste(GBD_2019$val, GBD_2019$Num_2019, sep = ' ')
+GBD_2019 <- unique(GBD_2019)
+head(GBD_2019)
+```
+## ASR 1990
+```{r}
+ASR_1990 <- subset(GBD, 
+                   year == 1990 & 
+                   age == 'Age-standardized' & 
+                   metric == 'Rate' & 
+                   measure == 'Deaths')
+
+
+ASR_1990 <- ASR_1990[, c(2, 8, 9, 10,11)] 
+
+ASR_1990$val <- round(ASR_1990$val, 1)  
+
+
+ASR_1990$upper <- round(ASR_1990$upper,1)
+ASR_1990$lower <- round(ASR_1990$lower, 1)
+# Check the dimensions of the dataframe
+dim(ASR_1990)
+
+if (!"Num_1990" %in% colnames(ASR_1990)) {
+  ASR_1990$Num_1990 <- ""
+}
+
+# Update Num_1990 column
+ASR_1990$Num_1990 <- paste('(', round(ASR_1990$val, 1), ")")
+
+ASR_1990$Num_1990 <- paste(ASR_1990$lower, ASR_1990$upper, sep = '-') 
+ASR_1990$Num_1990 <- paste(ASR_1990$Num_1990, ')', sep = '')              
+ASR_1990$Num_1990 <- paste('(', ASR_1990$Num_1990, sep = '')  
+ASR_1990$Num_1990 <- paste(ASR_1990$val, ASR_1990$Num_1990, sep = ' ')
+ASR_1990 <- unique(ASR_1990)
+head(ASR_1990)
+```
+
+## ASR 2019
+```{r}
+ASR_2019 <- subset(GBD, 
+                   year == 2019 & 
+                   age == 'Age-standardized' & 
+                   metric == 'Rate' & 
+                   measure == 'Deaths')
+
+
+ASR_2019 <- ASR_2019[, c(2, 8, 9, 10,11)] 
+
+ASR_2019$val <- round(ASR_2019$val, 1)  
+
+
+ASR_2019$upper <- round(ASR_2019$upper,1)
+ASR_2019$lower <- round(ASR_2019$lower, 1)
+# Check the dimensions of the dataframe
+dim(ASR_2019)
+
+if (!"Num_2019" %in% colnames(ASR_2019)) {
+  ASR_2019$Num_2019 <- ""
+}
+
+# Update Num_2019 column
+ASR_2019$Num_2019 <- paste('(', round(ASR_2019$val, 1), ")")
+
+ASR_2019$Num_2019 <- paste(ASR_2019$lower, ASR_2019$upper, sep = '-') 
+ASR_2019$Num_2019 <- paste(ASR_2019$Num_2019, ')', sep = '')              
+ASR_2019$Num_2019 <- paste('(', ASR_2019$Num_2019, sep = '')  
+ASR_2019$Num_2019 <- paste(ASR_2019$val, ASR_2019$Num_2019, sep = ' ')
+ASR_2019 <- unique(ASR_2019)
+head(ASR_2019)
+```
+##### EAPC
+```{r}
+GBD_DALY <- subset(GBD, GBD$age_name=='Age-standardized' & 
+                         GBD$metric_name== 'Rate' &
+                         GBD$measure_name=='DALYs (Disability-Adjusted Life Years)' )
+
+
+EAPC <- subset(GBD, GBD$age=='Age-standardized' & 
+                 GBD$metric== 'Rate' &
+                 GBD$measure=='DALYs (Disability-Adjusted Life Years)' )
+EAPC <- EAPC[,c(2, 8, 9, 10,11)] 
+dim(EAPC)
+head(EAPC)
+
+
+country <- GBD_1990$location
+EAPC_cal <- data.frame(location = country, EAPC = rep(0, times = 22), UCI = rep(0, times = 22), LCI = rep(0, times = 22)) 
+
+for (i in 1:22) { 
+  country_cal <- as.character(EAPC_cal[i, 1]) 
+  a <- subset(EAPC, location == country_cal)  
+  a$y <- log(a$val)
+  mod_simp_reg <- lm(y ~ year, data = a) 
+  estimate <- (exp(summary(mod_simp_reg)[["coefficients"]][2, 1]) - 1) * 100 
+  low <- (exp(summary(mod_simp_reg)[["coefficients"]][2, 1] - 1.96 * summary(mod_simp_reg)[["coefficients"]][2, 2]) - 1) * 100
+  high <- (exp(summary(mod_simp_reg)[["coefficients"]][2, 1] + 1.96 * summary(mod_simp_reg)[["coefficients"]][2, 2]) - 1) * 100
+
+  EAPC_cal[i, 2] <- estimate
+  EAPC_cal[i, 4] <- low
+  EAPC_cal[i, 3] <- high
+}
+EAPC_cal$EAPC <- round(EAPC_cal$EAPC,2) 
+EAPC_cal$UCI <- round(EAPC_cal$UCI,2)
+EAPC_cal$LCI <- round(EAPC_cal$LCI,2)
+EAPC_cal$EAPC_CI <- paste(EAPC_cal$LCI,EAPC_cal$UCI,sep = '-') 
+EAPC_cal$EAPC_CI <- paste(EAPC_cal$EAPC_CI,')',sep = '') 
+EAPC_cal$EAPC_CI <- paste('(',EAPC_cal$EAPC_CI,sep = '') 
+EAPC_cal$EAPC_CI <- paste(EAPC_cal$EAPC,EAPC_cal$EAPC_CI,sep = ' ') 
+EAPC_cal <- unique(EAPC_cal)
+head(EAPC_cal)
+print(EAPC_cal)
+```
+```{r}
+GBD_1990 <- GBD_1990[,c(1,6)]  
+ASR_1990 <- ASR_1990[,c(1,6)]
+GBD_2019 <- GBD_2019[,c(1,6)]
+ASR_2019 <- ASR_2019[,c(1,6)]
+EAPC_cal <- EAPC_cal[,c(1,5)]
+# Assuming you have dataframes named GBD_1990, ASR_1990, GBD_2019, ASR_2019, and EAPC_cal
+
+# Merge GBD_1990, ASR_1990, GBD_2019, ASR_2019, and EAPC_cal by location
+merged_data <- merge(GBD_1990, ASR_1990, by = "location", all = TRUE)
+merged_data <- merge(merged_data, GBD_2019, by = "location", all = TRUE)
+merged_data <- merge(merged_data, ASR_2019, by = "location", all = TRUE)
+merged_data <- merge(merged_data, EAPC_cal, by = "location", all = TRUE)
+# Remove rows with exactly the same values across all columns
+unique_merged_data <- unique(merged_data)
+unique_merged_data
+```
+```{r}
+# Remove rows with exact duplicates across all columns except 'Num_1990.y'
+unique_data <- distinct(unique_merged_data, .keep_all = TRUE)
+
+# Rename the 'Num_1990.y' column to 'ASR_1990'
+DALY <- unique_data %>% 
+  rename(ASR_1990 = Num_1990.y) %>% 
+  rename(ASR_2019 = Num_2019.y) %>% 
+  rename(Num_1990 = Num_1990.x) %>% 
+  rename(Num_2019 = Num_2019.x)  
+DALY <- unique(DALY)
+DALY
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

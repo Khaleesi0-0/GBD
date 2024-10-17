@@ -1,0 +1,152 @@
+---
+title: "hierarchy cluster"
+output: html_document
+date: "2024-05-05"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(ggplot2)
+library(factoextra)
+library(ggsci)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+```{r}
+GBD <- read.csv("C:/Users/khaleesi/Desktop/GBD/Nation.csv")
+
+head(GBD)
+GBD %>%
+  count(measure, sort = TRUE) %>%
+  count(measure, sort = TRUE)
+GBD
+```
+```{r}
+
+GBD_nation <- subset(GBD, 
+                   year == 2019 & 
+                   age == 'Age-standardized' & 
+                   metric == 'Percent' & 
+                   measure == 'DALYs (Disability-Adjusted Life Years)')
+GBD_nation 
+```
+
+```{r cars}
+GBD_Death <- subset(GBD, GBD$age_name=='Age-standardized' & 
+                         GBD$metric_name== 'Rate' &
+                         GBD$measure_name=='Deaths' )
+
+
+EAPC <- subset(GBD, GBD$age=='Age-standardized' & 
+                 GBD$metric== 'Rate' &
+                 GBD$measure=='Deaths' )
+EAPC <- EAPC[,c(2, 8, 9, 10,11)] 
+dim(EAPC)
+head(EAPC)
+
+GBD_1 <- subset(GBD, 
+                   year == 1990 & 
+                   age == 'All ages' & 
+                   metric == 'Number' & 
+                   measure == 'Deaths')
+country <- GBD_1$location
+EAPC_cal <- data.frame(location = country, EAPC = rep(0, times = 204), UCI = rep(0, times = 204), LCI = rep(0, times = 204)) 
+
+for (i in 1:204) { 
+  country_cal <- as.character(EAPC_cal[i, 1]) 
+  a <- subset(EAPC, location == country_cal)  
+  a$y <- log(a$val)
+  mod_simp_reg <- lm(y ~ year, data = a) 
+  estimate <- (exp(summary(mod_simp_reg)[["coefficients"]][2, 1]) - 1) * 100 
+  low <- (exp(summary(mod_simp_reg)[["coefficients"]][2, 1] - 1.96 * summary(mod_simp_reg)[["coefficients"]][2, 2]) - 1) * 100
+  high <- (exp(summary(mod_simp_reg)[["coefficients"]][2, 1] + 1.96 * summary(mod_simp_reg)[["coefficients"]][2, 2]) - 1) * 100
+
+  EAPC_cal[i, 2] <- estimate
+  EAPC_cal[i, 4] <- low
+  EAPC_cal[i, 3] <- high
+}
+EAPC_cal$EAPC <- round(EAPC_cal$EAPC,2) 
+EAPC_cal$UCI <- round(EAPC_cal$UCI,2)
+EAPC_cal$LCI <- round(EAPC_cal$LCI,2)
+EAPC_cal$EAPC_CI <- paste(EAPC_cal$LCI,EAPC_cal$UCI,sep = '-') 
+EAPC_cal$EAPC_CI <- paste(EAPC_cal$EAPC_CI,')',sep = '') 
+EAPC_cal$EAPC_CI <- paste('(',EAPC_cal$EAPC_CI,sep = '') 
+EAPC_cal$EAPC_CI <- paste(EAPC_cal$EAPC,EAPC_cal$EAPC_CI,sep = ' ') 
+EAPC_cal <- unique(EAPC_cal)
+EAPC_death <- EAPC_cal[,c(1,2)]
+head(EAPC_cal)
+EAPC_death
+```
+
+```{r}
+df <- data.frame(EAPC_death = as.numeric(EAPC_death$EAPC))
+df <- na.omit(df)
+df <- scale(df)
+# Hierarchical clustering
+res.hc<- hclust(dist(df,method="euclidean"), method = "complete")
+fviz_dend(res.hc,cex=0.5,k=4,color_labels_by_k= TRUE, k_colors=c('#3399FF','lightblue','red','#FFCC66'),horiz=T, rect =TRUE)
+```
+```{r}
+library(fivethirtyeight)
+library(tidyverse)
+EAPC_death <- EAPC_death %>%
+  column_to_rownames(var = "location")
+hier_model <- hclust(dist(scale(EAPC_death)), method = "complete")
+fviz_dend(hier_model, horiz = TRUE, k = 4, cex = .4)
+```
+
+## Risk
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+Risk <- read.csv("C:/Users/khaleesi/Desktop/GBD/Risk.csv")
+order <- read.csv('C:/Users/khaleesi/Desktop/GBD/order.csv',header = F)
+Risk %>%
+  count(rei, sort = TRUE) 
+head(Risk)
+```
+```{r}
+order$V1 <- rev(order$V1)
+Risk_2019 <- subset(Risk, year == 2019 &
+                             age == 'All ages' &
+                             metric == 'Percent' &
+                             measure %in% c('DALYs (Disability-Adjusted Life Years)', 'Deaths'))
+Risk_2019 %>%
+  count(location, sort = TRUE) 
+Risk_2019 <- unique(Risk_2019)
+head(Risk_2019)
+Risk_2019 <- na.omit(Risk_2019)
+Risk_2019$val <- round(Risk_2019$val*100,1)
+Risk_2019$val2 <- paste0(Risk_2019$val,'%')
+Risk_2019$location <- factor(Risk_2019$location, 
+                                  levels=order$V1, 
+                                  ordered=TRUE)
+Risk_2019$rei <- factor(Risk_2019$rei, 
+                        levels= c('Ambient particulate matter pollution', 
+                                  'Household air pollution from solid fuels'), 
+                        ordered=TRUE) 
+
+
+
+p1 <- ggplot(na.omit(Risk_2019), aes(location, weight = val, fill = measure)) +
+  geom_bar(color = 'black', width = 0.7, position = 'dodge', size = 0.3) +
+  scale_y_continuous(expand = c(0, 0)) +
+  scale_fill_manual(values = c("lightblue", "pink")) +  # Setting custom fill colors
+  theme_classic() +
+  coord_flip() +
+  facet_grid(. ~ rei) +
+  theme_light() +
+  geom_text(aes(label = val2, y = val + 7.5), position = position_dodge(0.9), vjust = 0, size = 4)
+
+# Display the plot
+print(p1)
+
+```
+
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
